@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    container_name: jasa-ha-store-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mqtt_data
+      MYSQL_USER: mqttdata
+      MYSQL_PASSWORD: mqttdata
+      TZ: Europe/Helsinki  # Sets timezone inside container
+    command: --default-time-zone='Europe/Helsinki'
+    ports:
+      - "3606:3306"
+    volumes:
+      - jasa-ha-store:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    container_name: jasa-ha-store-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8480:80"
+    depends_on:
+      - mysql
+
+  mqtt_loader:
+    image: jasatest/jasa-mqtt-to-mysql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    container_name: jasa-ha-store-mqtt
+    restart: always
+    network_mode: host
+    environment:
+      MYSQL_PORT: 3606
+    depends_on:
+      - mysql
+
+  ha_loader:
+    image: jasatest/jasa-ha-to-mysql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    container_name: jasa-ha-store-ha
+    restart: always
+    network_mode: host
+    environment:
+      MYSQL_PORT: 3606
+      HA_URL: ws://192.168.2.68:8123/api/websocket
+      HA_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxZjczZGI4MGYxYjI0NmQyYWNkNzFjNjdkZGU0N2IxOSIsImlhdCI6MTc1NDIxOTU4OCwiZXhwIjoyMDY5NTc5NTg4fQ.KN79YP0rqtPL9ZFeQxNLRJGCs-o3YE0obrssMyVB13k
+    depends_on:
+      - mysql
+
+volumes:
+  jasa-ha-store:
