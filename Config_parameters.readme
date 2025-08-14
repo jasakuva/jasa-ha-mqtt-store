@@ -1,0 +1,20 @@
+PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+
+MYSQL_PORT: 3606
+
+
+MQTT_BROKER: localhost
+MQTT_PORT: 1883
+MQTT_TOPIC: #
+
+MYSQL_HOST: localhost
+MYSQL_USER: mqttdata
+MYSQL_PWD: mqttdata
+MYSQL_DATABASE: mqtt_data
+MYSQL_PORT: 3306
+
+HA_URL: ws://192.168.2.68:8123/api/websocket
+HA_TOKEN: mytoken
