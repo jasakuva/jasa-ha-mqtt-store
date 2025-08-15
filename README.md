@@ -1,0 +1,28 @@
+
+Parameters for MYSQL\
+PMA_HOST: mysql\
+PMA_PORT: 3306\
+PMA_USER: root\
+PMA_PASSWORD: rootpassword\
+\
+Parameters for PHPMYSQL\
+MYSQL_PORT: 3606\
+
+Parameters for MQTT LOADER\
+MQTT_BROKER: localhost\
+MQTT_PORT: 1883\
+MQTT_TOPIC: #\
+MYSQL_HOST: localhost\
+MYSQL_USER: mqttdata\
+MYSQL_PWD: mqttdata\
+MYSQL_DATABASE: mqtt_data\
+MYSQL_PORT: 3306\
+\
+Parameters for HA LOADER\
+MYSQL_HOST: localhost\
+MYSQL_USER: mqttdata\
+MYSQL_PWD: mqttdata\
+MYSQL_DATABASE: mqtt_data\
+MYSQL_PORT: 3306\
+HA_URL: ws://my_ha_address:8123/api/websocket\
+HA_TOKEN: mytoken\
