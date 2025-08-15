@@ -1,4 +1,4 @@
-# Project Name
+# HA and MQTT data to MySQL data base
 
 **Short Description:** This Python project collects Home Assistant entity states as they change and listens to MQTT queue messages, storing both types of data into a MySQL database.
 
