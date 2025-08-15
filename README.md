@@ -1,4 +1,6 @@
-# Projektin nimi
+ [English version](readme_en.md)
+
+# HA ja MQTT data MySQL tietokantaan
 
 **Lyhyt kuvaus:** Tämä Python-projekti hakee Home Assistant -järjestelmästä entityjen tilat heti niiden muuttuessa sekä kuuntelee MQTT-jonon viestejä ja tallentaa molempien tiedot MySQL-tietokantaan.
 
