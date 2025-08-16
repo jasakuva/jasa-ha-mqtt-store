@@ -28,7 +28,120 @@ Projektin palvelut ajetaan neljässä Docker-kontissa (Docker Compose):
 
 ## Asennus ja käynnistys (Docker Compose)
 
-Tämä projekti on suunniteltu ajettavaksi Docker Composella. Alla valmis `docker-compose.yml`:
+Tämä projekti on suunniteltu ajettavaksi Docker Composella. Projektin juuressa on valmis `docker-compose.yml`
+
+
+**Käynnistä palvelut:**
+
+```bash
+docker-compose up -d
+```
+
+---
+## Käyttö
+
+1. Määritä tarvittavat ympäristömuuttujat docker.compose.yml tiedostoon (ks. lista alla, jossa oletusparametrit).
+2. Käynnistä Docker Compose -pino: `docker-compose up -d`.
+3. Tarkista palvelujen lokit: `docker-compose logs -f mqtt_loader` tai `docker-compose logs -f ha_loader`.
+4. Hallitse tietokantaa phpMyAdminilla: `http://localhost:8480`.
+
+---
+
+## Konfiguraatioparametrit
+
+MySQL ja phpMyAdmin osioihin ei tarvitse tehdä muutoksia.
+MQTT Loader osioon täytyy laittaa MQTT -brokerin osoite, jos jokin muu kuin sama palvelin, jossa nämä kontit pyörivät.\
+ - MQTT_BROKER=MQTT_broker_address\
+
+HA Loadet osioon täytyy laittaa Home Assistantin osoite ja Home Assistantissa generoitu käyttäjä token:\
+ 
+ - HA_URL: ws://YOUR_HA_ADDRESS:8123/api/websocket
+ - HA_TOKEN: YUOR_HA_TOKEN
+
+**MySQL**
+
+```
+PMA_HOST=mysql
+PMA_PORT=3306
+PMA_USER=root
+PMA_PASSWORD=rootpassword
+```
+
+**phpMyAdmin**
+
+```
+MYSQL_PORT=3606
+```
+
+**MQTT Loader**
+
+```
+MQTT_BROKER=localhost
+MQTT_PORT=1883
+MQTT_TOPIC=#
+MYSQL_HOST=localhost
+MYSQL_USER=mqttdata
+MYSQL_PWD=mqttdata
+MYSQL_DATABASE=mqtt_data
+MYSQL_PORT=3306
+```
+
+**HA Loader**
+
+```
+MYSQL_HOST=localhost
+MYSQL_USER=mqttdata
+MYSQL_PWD=mqttdata
+MYSQL_DATABASE=mqtt_data
+MYSQL_PORT=3306
+HA_URL=ws://my_ha_address:8123/api/websocket
+HA_TOKEN=mytoken
+```
+
+
+---
+
+
+
+## Tietokantataulut ja sarakkeet
+
+- **ha\_state\_change**
+
+  - `changeid` (INT, PRIMARY KEY, AUTO\_INCREMENT)
+  - `entity` (VARCHAR(255), NOT NULL)
+  - `friendly_name` (VARCHAR(255))
+  - `state` (VARCHAR(255))
+  - `ts` (TIMESTAMP, DEFAULT CURRENT\_TIMESTAMP)
+
+- **ha\_state\_attributes**
+
+  - `id` (INT, PRIMARY KEY, AUTO\_INCREMENT)
+  - `changeid` (INT, FOREIGN KEY → ha\_state\_change.changeid)
+  - `attribute` (VARCHAR(255))
+  - `value` (TEXT)
+
+- **message\_json**
+
+  - `messageid` (INT, PRIMARY KEY, AUTO\_INCREMENT)
+  - `sourceid` (INT, DEFAULT NULL)
+  - `message` (TEXT, NOT NULL)
+  - `topic` (VARCHAR(255), NOT NULL)
+  - `creationtime` (TIMESTAMP, DEFAULT CURRENT\_TIMESTAMP)
+
+- **message\_variabledata**
+
+  - `messageid` (INT, NOT NULL)
+  - `variable` (VARCHAR(255), NOT NULL)
+  - `data` (VARCHAR(255), NOT NULL)
+
+- **sources**
+
+  - `sourceid` (INT, PRIMARY KEY, AUTO\_INCREMENT)
+  - `name` (TEXT)
+  - `source_mqtt_key` (VARCHAR(255), NOT NULL)
+
+
+## docker-compose.yml
 
 ```yaml
 version: '3.8'
@@ -110,105 +223,6 @@ volumes:
   jasa-ha-store:
 ```
 
-**Käynnistä palvelut:**
-
-```bash
-docker-compose up -d
-```
-
----
-
-## Konfiguraatioparametrit
-
-**MySQL**
-
-```
-PMA_HOST=mysql
-PMA_PORT=3306
-PMA_USER=root
-PMA_PASSWORD=rootpassword
-```
-
-**phpMyAdmin**
-
-```
-MYSQL_PORT=3606
-```
-
-**MQTT Loader**
-
-```
-MQTT_BROKER=localhost
-MQTT_PORT=1883
-MQTT_TOPIC=#
-MYSQL_HOST=localhost
-MYSQL_USER=mqttdata
-MYSQL_PWD=mqttdata
-MYSQL_DATABASE=mqtt_data
-MYSQL_PORT=3306
-```
-
-**HA Loader**
-
-```
-MYSQL_HOST=localhost
-MYSQL_USER=mqttdata
-MYSQL_PWD=mqttdata
-MYSQL_DATABASE=mqtt_data
-MYSQL_PORT=3306
-HA_URL=ws://my_ha_address:8123/api/websocket
-HA_TOKEN=mytoken
-```
-
----
-
-## Tietokantataulut ja sarakkeet
-
-- **ha\_state\_change**
-
-  - `changeid` (INT, PRIMARY KEY, AUTO\_INCREMENT)
-  - `entity` (VARCHAR(255), NOT NULL)
-  - `friendly_name` (VARCHAR(255))
-  - `state` (VARCHAR(255))
-  - `ts` (TIMESTAMP, DEFAULT CURRENT\_TIMESTAMP)
-
-- **ha\_state\_attributes**
-
-  - `id` (INT, PRIMARY KEY, AUTO\_INCREMENT)
-  - `changeid` (INT, FOREIGN KEY → ha\_state\_change.changeid)
-  - `attribute` (VARCHAR(255))
-  - `value` (TEXT)
-
-- **message\_json**
-
-  - `messageid` (INT, PRIMARY KEY, AUTO\_INCREMENT)
-  - `sourceid` (INT, DEFAULT NULL)
-  - `message` (TEXT, NOT NULL)
-  - `topic` (VARCHAR(255), NOT NULL)
-  - `creationtime` (TIMESTAMP, DEFAULT CURRENT\_TIMESTAMP)
-
-- **message\_variabledata**
-
-  - `messageid` (INT, NOT NULL)
-  - `variable` (VARCHAR(255), NOT NULL)
-  - `data` (VARCHAR(255), NOT NULL)
-
-- **sources**
-
-  - `sourceid` (INT, PRIMARY KEY, AUTO\_INCREMENT)
-  - `name` (TEXT)
-  - `source_mqtt_key` (VARCHAR(255), NOT NULL)
-
----
-
-## Käyttö
-
-1. Määritä tarvittavat ympäristömuuttujat (ks. yllä).
-2. Käynnistä Docker Compose -pino: `docker-compose up -d`.
-3. Tarkista palvelujen lokit: `docker-compose logs -f mqtt_loader` tai `docker-compose logs -f ha_loader`.
-4. Hallitse tietokantaa phpMyAdminilla: `http://localhost:8480`.
-
----
 
 ## Lisenssi
 
