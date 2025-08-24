@@ -16,12 +16,12 @@ def createDatabase():
         conn = mysql.connector.connect(**config)
         cursor = conn.cursor(dictionary=True)
 
-        query = """CREATE TABLE `message_json` (
+        query = """CREATE TABLE IF NOT EXISTS `message_json` (
                 `messageid` int NOT NULL AUTO_INCREMENT,
                 `sourceid` int DEFAULT NULL,
                 `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
                 `topic` varchar(255) NOT NULL,
-                `crationtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `creationtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (`messageid`),
                 UNIQUE KEY `messageid` (`messageid`),
                 KEY `sourceid` (`sourceid`)
@@ -30,7 +30,7 @@ def createDatabase():
         cursor.execute(query)
 
 
-        query = """CREATE TABLE `message_variabledata` (
+        query = """CREATE TABLE IF NOT EXISTS `message_variabledata` (
                    `messageid` int NOT NULL,
                    `variable` varchar(255) NOT NULL,
                    `data` varchar(255) NOT NULL
@@ -39,7 +39,7 @@ def createDatabase():
         cursor.execute(query)
 
 
-        query = """CREATE TABLE `sources` (
+        query = """CREATE TABLE IF NOT EXISTS `sources` (
                    `sourceid` int NOT NULL AUTO_INCREMENT,
                    `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
                    `source_mqtt_key` varchar(255) NOT NULL,

@@ -4,6 +4,7 @@ import mysql.connector
 import os
 import time
 import createDatabase
+import checkAndUpdateDatabaseSchema
 
 # MQTT broker configuration
 BROKER = os.getenv('MQTT_BROKER', 'localhost') 
@@ -118,6 +119,7 @@ except FileNotFoundError:
         file.write("This is the first line\n")
     print(f"File '{file_path}' created.")
 
+checkAndUpdateDatabaseSchema.check_and_update_schema()
 client = mqtt.Client()
 client.on_message = on_message
 
